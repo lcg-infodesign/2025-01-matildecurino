@@ -33,6 +33,14 @@ let baseYStd1;
 let scaleXStd1;
 let calciatoriYOffsets = [];
 
+//variabili per mode2
+let mode2Images = []; //array di img
+let baseYMode2;
+let sectionHeightMode2 = 400; 
+let marginMode2 = 100; 
+let centerXMode2;
+let centerYMode2; 
+
 //funzioni media, standard deviation, mediana e moda
   function mean(arr) {
     return arr.reduce((a, b) => a + b, 0) / arr.length;
@@ -63,10 +71,32 @@ function preload() {
   //std column1
   campoCalcio = loadImage("campodacalcio.png");
   calciatore = loadImage("calciatore.png");
+
+  //mode column2 array
+   mode2Images = [
+    loadImage("necktie.png"),
+    loadImage("womans-sandal.png"),
+    loadImage("bikini.png"),
+    loadImage("handbag.png"),
+    loadImage("thong-sandal.png"),
+    loadImage("running-shoe.png"),
+    loadImage("flat-shoe.png"),
+    loadImage("billed-cap.png"),
+    loadImage("womans-hat.png"),
+    loadImage("womans-boot.png"),
+    loadImage("womans-clothes.png"),
+    loadImage("dress.png"),
+    loadImage("coat.png"),
+    loadImage("scarf.png"),
+    loadImage("jeans.png"),
+    loadImage("t-shirt.png"),
+    loadImage("gloves.png"),
+    loadImage("mans-shoe.png")
+  ];
 }
 
 function setup() {
-  createCanvas(1500, 2000);
+  createCanvas(1500, 2500);
   textSize(14);
   noLoop();
 
@@ -109,6 +139,11 @@ function setup() {
   spacing = (1000 - 2 * marginX) / (col0.length - 0.5);
   baseYMean0 = 500 - 100; // linea del terreno massimo
   maxPalmHeight = 300 ; // altezza massima della palma
+
+  baseYStd1 = 900;
+  baseYMode2 = baseYStd1 + 400 + sectionHeightMode2 / 2; 
+  centerXMode2 = (width / 2);
+  centerYMode2 = baseYMode2 - 100;
 }
 
 
@@ -253,6 +288,42 @@ function draw() {
   text(`${std1.toFixed(2)}`, centerCampoCalcioX + 300, 630);
 
   //Mode2
+  noStroke();
+  fill(255);
+  rect(marginMode2, baseYMode2 - sectionHeightMode2 / 2, width - 4 * marginMode2, sectionHeightMode2, 20);
+
+  //scritta centrale
+  fill(0);
+  textFont('Courier New');
+  textAlign(CENTER);
+  textSize(25);
+  text("Non c'è moda", centerXMode2 - 100, centerYMode2);
+
+  
+  imageMode(CENTER);
+  let imgSize = 55;
+  for (let k = 0; k < col2.length; k++) {
+    let xMode2 = random(marginMode2 + imgSize, width - 400 - imgSize);
+    let yMode2 = random(baseYMode2 - sectionHeightMode2 / 2 + imgSize, baseYMode2 + sectionHeightMode2 / 2 - imgSize);
+
+    image(mode2Images[k], xMode2, yMode2, imgSize, imgSize);
+
+    //valore specifico di ciascun oggetto
+    fill(0);
+    textSize(10);
+    textAlign(CENTER);
+    text(`(${col2[k]})`, xMode2, yMode2 - imgSize / 2 - 10);
+  }  
+
+  //titolo e spiegazione
+  noStroke();
+  fill(0);
+  textSize(25);
+  textAlign(LEFT);
+  text(`Mode column2 = ${mode2}`, 50, 1220);
+  textSize(14);
+  text("Nessuna moda (tutti i 18 valori sono diversi)", 50, 1240);
+
 }
 
 
