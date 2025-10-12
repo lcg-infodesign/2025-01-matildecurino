@@ -1,6 +1,5 @@
 let table; //tabella dataset
 let validRows = []; //righe valide che rispettano le regole
-let palm; //img della palma
 
 //variabili per le colonne e operazioni
 let col0 = [];
@@ -9,6 +8,7 @@ let col2 = [];
 let col3 = []; 
 let col4 = [];
 let mean0; 
+let mean1;
 let std1;
 let mode2;
 let median3;
@@ -16,6 +16,7 @@ let mean4;
 let std4;
 
 //variabili per mean0
+let palm; //img della palma
 let minvalMean0;
 let maxvalMean0;
 let marginX;
@@ -23,28 +24,16 @@ let spacing;
 let baseYMean0;
 let maxPalmHeight;
 
-function preload() {
-  table = loadTable("matildecurino/dataset.csv", "csv", "header");
+//variabili per std1 
+let campoCalcio; //img campo da calcio 
+let calciatore; //img del nuotatore
+let minvalStd1;
+let maxvalStd1;
+let baseYStd1;
+let scaleXStd1;
+let calciatoriYOffsets = [];
 
-  //media column0
-  palm = loadImage("palm.png");
-}
-
-function setup() {
-  createCanvas(1000, 700);
-  textSize(14);
-  noLoop();
-
-  //ciclo per la selezione delle righe che rispettano le rules assegnate
-  for (let r = 0; r < table.getRowCount(); r++) {
-    let c2 = table.getNum(r, "column2");
-    let c3 = table.getNum(r, "column3");
-    if (c2 < 0 && c3 >= 30 && c3 < 42) {
-      validRows.push(table.rows[r]);
-    }
-  }
-
-  //funzioni media, standard deviation, mediana e moda
+//funzioni media, standard deviation, mediana e moda
   function mean(arr) {
     return arr.reduce((a, b) => a + b, 0) / arr.length;
   }
@@ -64,6 +53,32 @@ function setup() {
     return Object.keys(counts).filter(k => counts[k] === maxCount).map(Number);
   }
 
+
+function preload() {
+  table = loadTable("matildecurino/dataset.csv", "csv", "header");
+
+  //mean column0
+  palm = loadImage("palm.png");
+
+  //std column1
+  campoCalcio = loadImage("campodacalcio.png");
+  calciatore = loadImage("calciatore.png");
+}
+
+function setup() {
+  createCanvas(1500, 2000);
+  textSize(14);
+  noLoop();
+
+  //ciclo per la selezione delle righe che rispettano le rules assegnate
+  for (let r = 0; r < table.getRowCount(); r++) {
+    let c2 = table.getNum(r, "column2");
+    let c3 = table.getNum(r, "column3");
+    if (c2 < 0 && c3 >= 30 && c3 < 42) {
+      validRows.push(table.rows[r]);
+    }
+  }
+
   //variabili per chiamare le colonne
   col0 = validRows.map(r => r.getNum("column0"));
   col1 = validRows.map(r => r.getNum("column1"));
@@ -74,8 +89,9 @@ function setup() {
   //variabili per chiamare il calcolo delle operazioni 
   //(media,moda,mediana,standard deviation)
   //relative alle specifiche colonne
-  mean0 = mean(col0);
-  std1 = std(col1);
+  mean0 = mean(col0); //ok
+  mean1= mean(col1); //per la rappresentazione grafica della standard deviation
+  std1 = std(col1); //ok
   mode2 = mode(col2);
   median3 = median(col3);
   mean4 = mean(col4);
@@ -97,6 +113,9 @@ function setup() {
 
 
 function draw() {
+
+  //Mean0
+
   //Scaling dei valori per la dimensione della palma
   function scalevalueMean0(valMean0) {
     return map(valMean0, minvalMean0, maxvalMean0, 50, maxPalmHeight);
@@ -154,4 +173,86 @@ function draw() {
   text(`Mean column0 = ${mean0.toFixed(2)}`, 50, 50);
   textSize(14);
   text("Linea di separazione tra la sabbia e il cielo ", 50, 70);
+
+
+
+  //Std1
+
+  //Valori min e max della column1
+  minvalStd1 = Math.min(...col1);
+  maxvalStd1 = Math.max(...col1);
+
+
+  baseYStd1 = 900;
+
+  let campoCalcioWidth = 800; //lunghezza campo
+  let campoCalcioHeight = 500; //altezza campo
+
+  //img campo da calcio
+  imageMode(CENTER);
+  image(campoCalcio, width / 2, baseYStd1, campoCalcioWidth, campoCalcioHeight);
+
+  //centro campo da calcio
+  let centerCampoCalcioX = width / 2;
+  //il campo da calcio rappresenta idealmente il doppio della 
+  //standard deviation (std1=62 scale sarà 124 circa)
+  let scaleXStd1 = campoCalcioWidth / (2 * std1); 
+
+  //mean 
+  stroke(255);
+  strokeWeight(5);
+  line(centerCampoCalcioX, baseYStd1 - campoCalcioHeight / 2, centerCampoCalcioX, baseYStd1 + campoCalcioHeight / 2);
+  noStroke();
+
+  //img calciatori
+  imageMode(CENTER);
+  textAlign(CENTER);
+  fill(0);
+  textSize(10);
+  
+  //la disposizione orizzontale (asse delle x) fa sì che i 
+  //calciatori siano disposti a sinistra se il loro valore associato 
+  //è minore della media (11.17) e a destra se è maggiore della media 
+  //Dato che moltiplico la xCalciatore per lo scaleXStd1 
+  //la posizione sarà proporzionale a quella dell'img
+  //e i calciatori che non rientrano nella standard deviation saranno fuori 
+  //dall'immagine
+  //La disposizione verticale è random 
+  for (let j = 0; j < col1.length; j++) {
+    let valStd1 = col1[j];
+    let xCalciatore = centerCampoCalcioX + (valStd1 - mean1) * scaleXStd1;
+
+    if (!calciatoriYOffsets[j]) {
+      calciatoriYOffsets[j] = random(-campoCalcioHeight / 2 + 10, campoCalcioHeight / 2 - 10);
+    }
+    let yCalciatore = baseYStd1 + calciatoriYOffsets[j];
+
+    //img calciatori
+    image(calciatore, xCalciatore, yCalciatore, 40, 50);
+
+    //valore valido relativo a ciascun calciatore 
+    //!!!!!!capire se togliere!!!!
+    text(`(${valStd1})`, xCalciatore, yCalciatore - 30);
+  }
+
+  //titolo e spiegazione
+  noStroke();
+  fill(0);
+  textSize(25);
+  textAlign(LEFT);
+  text(`Standard deviation column1 = ${std1.toFixed(2)}`, 50, 560);
+  textSize(14);
+  text("Area del campo da calcio (120 metri)", 50, 580);
+  //std e mean 
+  //!!!!!capire se togliere!!!
+  fill(0);
+  textSize(12);
+  textAlign(CENTER);
+  text(`Mean = ${mean1.toFixed(2)}`, centerCampoCalcioX, 630);
+  text(`${std1.toFixed(2)}`, centerCampoCalcioX - 300, 630);
+  text(`${std1.toFixed(2)}`, centerCampoCalcioX + 300, 630);
+
+  //Mode2
 }
+
+
