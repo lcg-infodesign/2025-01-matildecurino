@@ -41,6 +41,10 @@ let marginMode2 = 100;
 let centerXMode2;
 let centerYMode2; 
 
+//variabili per median3
+let parole = {};
+let baseYMedian3;
+
 //funzioni media, standard deviation, mediana e moda
   function mean(arr) {
     return arr.reduce((a, b) => a + b, 0) / arr.length;
@@ -55,11 +59,16 @@ let centerYMode2;
     return s.length % 2 === 0 ? (s[mid - 1] + s[mid]) / 2 : s[mid];
   }
   function mode(arr) {
-    let counts = {};
-    arr.forEach(x => counts[x] = (counts[x] || 0) + 1);
-    let maxCount = Math.max(...Object.values(counts));
-    return Object.keys(counts).filter(k => counts[k] === maxCount).map(Number);
+  let counts = {};
+  arr.forEach(x => counts[x] = (counts[x] || 0) + 1);
+  let maxCount = Math.max(...Object.values(counts));
+
+  if (maxCount === 1) {
+    return null; 
   }
+
+  return Object.keys(counts).filter(k => counts[k] === maxCount).map(Number);
+}
 
 
 function preload() {
@@ -144,6 +153,21 @@ function setup() {
   baseYMode2 = baseYStd1 + 400 + sectionHeightMode2 / 2; 
   centerXMode2 = (width / 2);
   centerYMode2 = baseYMode2 - 100;
+
+
+  baseYMedian3 = 1500;
+  parole = {
+    32: "Salut", //francese  
+    41: "Hello", //inglese  
+    31: "Olá", //portoghese   
+    36: "Hola", //spagnolo 
+    40: "Annyeong", //coreano
+    39: "Hallo", //tedesco
+    33: "Ciao", //italiano  
+    30: "Yasou", //greco
+    35: "Marhaba", //arabo
+    37: "Privet" //russo
+  }
 }
 
 
@@ -323,6 +347,54 @@ function draw() {
   text(`Mode column2 = ${mode2}`, 50, 1220);
   textSize(14);
   text("Nessuna moda (tutti i 18 valori sono diversi)", 50, 1240);
+
+
+
+
+  //Median3
+  noStroke();
+  fill(0);
+  textSize(25);
+  textAlign(LEFT);
+  text(`Median column3 = ${median3}`, 50, baseYMedian3+ 230);
+  textSize(14);
+  text("Ciao evidenziato", 50, baseYMedian3 + 250);
+  
+  textAlign(LEFT);
+  textSize(14);
+  let leftMarginMedian3 = 50;              
+  let spacingXMedian3 = 70;              
+  let yTextCol3 = baseYMedian3 + 300; 
+
+  //calcolo dei due valori nella posizione posizione centrale 
+  let s = col3.slice().sort((a, b) => a - b);
+  let mid1 = Math.floor(s.length / 2) - 1;
+  let mid2 = mid1 + 1;
+  
+
+  //ciclo per associare ai valori della column3 le parole 
+  for (let w = 0; w < col3.length; w++) {
+    let valcol3 = col3[w];
+    let wordSalutoCol3 = parole[valcol3];
+    let xParoleCol3 = leftMarginMedian3 + w * spacingXMedian3;
+
+    //se il valore è uno dei due centrali allora 
+    //la parola corrispondente sarà maiuscolo e rosso
+    //else nero e lowercase normale
+    if (w === mid1 || w === mid2) {
+      fill(255, 0, 0);
+      text(wordSalutoCol3.toUpperCase(), xParoleCol3, yTextCol3);
+      textSize(10);
+      text(`(${valcol3})`, xParoleCol3, yTextCol3 + 25);
+      textSize(14);
+    } else {
+      fill(0);
+      text(wordSalutoCol3, xParoleCol3, yTextCol3);
+      textSize(10);
+      text(`(${valcol3})`, xParoleCol3, yTextCol3 + 25);
+      textSize(14);
+    }
+  }
 
 }
 
