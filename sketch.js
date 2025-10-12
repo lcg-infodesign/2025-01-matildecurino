@@ -231,7 +231,7 @@ function draw() {
   textAlign(LEFT);
   text(`Mean column0 = ${mean0.toFixed(2)}`, 50, 50);
   textSize(14);
-  text("Linea di separazione tra la sabbia e il cielo ", 50, 70);
+  text("Linea di separazione tra la sabbia e il cielo.", 50, 70);
 
 
 
@@ -301,7 +301,7 @@ function draw() {
   textAlign(LEFT);
   text(`Standard deviation column1 = ${std1.toFixed(2)}`, 50, 560);
   textSize(14);
-  text("Area del campo da calcio (120 metri)", 50, 580);
+  text("Area del campo da calcio (120 metri).", 50, 580);
   //std e mean 
   //!!!!!capire se togliere!!!
   fill(0);
@@ -346,7 +346,7 @@ function draw() {
   textAlign(LEFT);
   text(`Mode column2 = ${mode2}`, 50, 1220);
   textSize(14);
-  text("Nessuna moda (tutti i 18 valori sono diversi)", 50, 1240);
+  text("Nessuna moda (tutti i 18 valori sono diversi).", 50, 1240);
 
 
 
@@ -394,6 +394,48 @@ function draw() {
       text(`(${valcol3})`, xParoleCol3, yTextCol3 + 25);
       textSize(14);
     }
+  }
+
+
+
+  //Mean4 e Std4
+  noStroke();
+  fill(0);
+  textSize(25);
+  textAlign(LEFT);
+  text(`Mean column4 = ${mean4.toFixed(2)} `, 50, baseYMedian3+ 420);
+  text(`Standard deviation column4 = ${std4.toFixed(2)}`, 50, baseYMedian3+ 450);
+  textSize(14);
+  text("Sono evidenziati i valori che rientrano nella standard deviation.", 50, baseYMedian3 + 470);
+
+  textAlign(CENTER);
+  textSize(14);
+
+  //valori disposti in ordine crescente da sx verso dx
+  let col4Sorted = col4.slice().sort((a, b) => a - b);
+
+  let baseYCol4 = baseYMedian3 + 520;
+  let leftMarginCol4 = 80;
+  let spacingXCol4 = 70;
+
+  //intervallo dei valori che rientrano nella std (a sinistra o a destra della media)
+  let valStdPrimaDellaMean4 = mean4 - std4;
+  let valStdDopoLaMean4 = mean4 + std4;
+
+  //valori in ordine crescente
+  for (let q = 0; q < col4Sorted.length; q++) {
+    let val4 = col4Sorted[q];
+    let xValCol4 = leftMarginCol4 + q * spacingXCol4;
+
+    //se il valore rientra nel range dei valori compresi tra la media e la std a destra
+    //o sinistra, allora sono rossi, se no neri
+    if (val4 >= valStdPrimaDellaMean4 && val4 <= valStdDopoLaMean4) {
+      fill(255, 0, 0);
+    } else {
+      fill(0);
+    }
+
+    text(val4.toFixed(2), xValCol4, baseYCol4);
   }
 
 }
